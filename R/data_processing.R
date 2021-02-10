@@ -355,3 +355,22 @@ prepare_for_metareport_bubble_chart <- function(data_asset_type,
       value_y = .data$share_build_out
     )
 }
+
+prepare_for_metareport_timeline_chart <- function(data_asset_type, sector_filter) {
+
+  data_time_series <- data_asset_type %>%
+    filter(.data$ald_sector == sector_filter,
+           .data$technology == technology_filter,
+           .data$allocation == "portfolio_weight",
+           .data$year != "2030",
+           .data$investor_name != "Meta Investor") %>%
+    select(.data$investor_name, .data$year, .data$plan_emission_factor,
+           .data$scen_emission_factor) %>%
+    filter(!is.na(.data$scen_emission_factor))
+
+  aviation<-melt(data_time_series, id=1:2)
+  aviation$variable<-as.character(aviation$variable)
+  aviation[aviation=="plan_emission_factor"]<-"Planned"
+  aviation[aviation=="scen_emission_factor"]<-"Scenario"
+
+}
